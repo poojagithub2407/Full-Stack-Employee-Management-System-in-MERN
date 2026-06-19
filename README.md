@@ -6,6 +6,12 @@ This project helps organizations manage employees, attendance, leave requests, a
 
 ---
 
+## 🌐 Live Links
+
+- **Frontend:** https://full-stack-employee-management-syst-tau.vercel.app/login
+- **Backend:** https://full-stack-employee-management-syst-xi.vercel.app
+
+
 ## 📌 Project Overview
 
 This Full Stack Employee Management System includes real-world features like:

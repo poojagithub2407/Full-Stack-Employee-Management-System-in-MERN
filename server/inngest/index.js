@@ -131,7 +131,7 @@ const leaveApplicationReminder = inngest.createFunction(
 const attendanceReminderCron = inngest.createFunction(
      {
           id: "attendance-reminder-cron",
-          triggers: [{ cron: "0 0 6 * * *" }],
+          triggers: [{ cron: "0 6 * * *" }], // 6:00 AM UTC = 11:30 AM IST
      },
 
      async ({ step }) => {
@@ -153,7 +153,7 @@ const attendanceReminderCron = inngest.createFunction(
           });
 
           const activeEmployees = await step.run(
-               "get-active-employee",
+               "get-active-employees",
                async () => {
                     const employees = await Employee.find({
                          isDeleted: false,
@@ -213,43 +213,42 @@ const attendanceReminderCron = inngest.createFunction(
                await step.run(
                     "send-reminder-emails",
                     async () => {
-                         const emailPromises = absentEmployees.map(
-                              (emp) =>
-                                   sendEmail({
-                                        to: emp.email,
-                                        subject:
-                                             "Attendance Reminder - Please Mark Your Attendance",
-                                        body: `
-                  <div style="max-width: 600px; font-family: Arial, sans-serif;">
-                    <h2>Hi ${emp.firstName}, 👋</h2>
+                         const emailPromises = absentEmployees.map((emp) =>
+                              sendEmail({
+                                   to: emp.email,
+                                   subject:
+                                        "Attendance Reminder - Please Mark Your Attendance",
+                                   body: `
+                                   <div style="max-width:600px;font-family:Arial,sans-serif;">
+                                        <h2>Hi ${emp.firstName}, 👋</h2>
 
-                    <p style="font-size: 16px;">
-                      We noticed you haven't marked your attendance yet today.
-                    </p>
+                                        <p style="font-size:16px;">
+                                             We noticed you haven't marked your attendance yet today.
+                                        </p>
 
-                    <p style="font-size: 16px;">
-                      The deadline was <strong>11:30 AM</strong> and your attendance is still missing.
-                    </p>
+                                        <p style="font-size:16px;">
+                                             The deadline was <strong>11:30 AM</strong> and your attendance is still missing.
+                                        </p>
 
-                    <p style="font-size: 16px;">
-                      Please check in as soon as possible or contact your admin if you're facing any issues.
-                    </p>
+                                        <p style="font-size:16px;">
+                                             Please check in as soon as possible or contact your admin if you're facing any issues.
+                                        </p>
 
-                    <br />
+                                        <br/>
 
-                    <p style="font-size: 14px; color: #666;">
-                      Department: ${emp.department}
-                    </p>
+                                        <p style="font-size:14px;color:#666;">
+                                             Department: ${emp.department}
+                                        </p>
 
-                    <br />
+                                        <br/>
 
-                    <p style="font-size: 16px;">Best Regards,</p>
-                    <p style="font-size: 16px;">
-                      <strong>QuickEMS</strong>
-                    </p>
-                  </div>
-                `,
-                                   })
+                                        <p style="font-size:16px;">Best Regards,</p>
+                                        <p style="font-size:16px;">
+                                             <strong>QuickEMS</strong>
+                                        </p>
+                                   </div>
+                                   `,
+                              })
                          );
 
                          await Promise.all(emailPromises);
